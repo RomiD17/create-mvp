@@ -1,5 +1,28 @@
 #!/usr/bin/env node
 
-const add = require('../index');
+const {execSync} = require('child_process');
 
-console.log(add(Number(process.argv[2]), Number(process.argv[3])));
+const runCommand = command =>{
+  try{
+    execSync(`${command}`, {stdio: 'inherit'});
+  } catch (e){
+    console.error(`Failed to execute ${command}`, e);
+    return false;
+  }
+  return true
+}
+
+const repoName = process.argv[2];
+const gitCheckoutCommand = `git clone --depth 1 https://github.com/RomiD17/create-mvp ${repoName}`;
+const installDepsCommand = `cd ${repoName} && npm install`;
+
+console.log(`Cloning the repository with name ${repoName}`);
+const checkedOut = runCommand(gitCheckoutCommand);
+if(!checkedOut) process.exit(-1);
+
+console.log(`Installing dependecies for ${repoName}`);
+const installDeps = runCommand(installDepsCommand);
+if(!installDeps) process.exit(-1);
+
+console.log("Congratulations! You are ready. Follow the folowing commands to start");
+console.log(`cd ${repoName} && npm start`);
